@@ -54,12 +54,7 @@ namespace MD5_Hash_Auto
             {
                 lst_files.Items.Add(s);
             }
-            
         }
-
-
-
-
 
         /// <summary>
         /// RichTextBox 내용 초기화 메서드
@@ -77,33 +72,34 @@ namespace MD5_Hash_Auto
             // 실제 파일 드래그 했을 때 exe 창에 표시 되도록 
             string fciv = sg.GetResourceFileName();
 
-            foreach (string s in lst_files.Items)
+            if (lst_files.Items.Count == 0)
             {
-                string filePath = Path.Combine(s);
-                Debug.Print(s);
-               
-                string resultText = sg.RunExecute($"{fciv} certutil -hashfile {s} MD5");
-                Debug.Print(resultText);
+                MessageBox.Show("무결성 확인을 위한 파일을 추가해주세요.");
+            }
+            else
+            {
+                foreach (string s in lst_files.Items)
+                {
+                    string filePath = Path.Combine(s);
+                    Debug.Print(s);
 
-                // 테스트 코드 (쓸 때 없는 텍스트를 지워주기 위해 임시로 테스트 )
-                string cutText = resultText;
-                string outputText;
-                outputText = cutText.Substring(cutText.IndexOf("All rights reserved."));
-                outputText = outputText.Replace("All rights reserved.", string.Empty);
-                //outputText = cutText.Substring(50, cutText.Length);
+                    string resultText = sg.RunExecute($"{fciv} certutil -hashfile {s} MD5");
+                    Debug.Print(resultText);
 
-                rtxt_result.AppendText(Environment.NewLine + outputText);
-                rtxt_result.AppendText(string.Format("{0}", "--------------------") + Environment.NewLine);
+                    // 테스트 코드 (쓸 때 없는 텍스트를 지워주기 위해 임시로 테스트 )
+                    string cutText = resultText;
+                    string outputText;
+                    outputText = cutText.Substring(cutText.IndexOf("All rights reserved."));
+                    outputText = outputText.Replace("All rights reserved.", string.Empty);
+                    //outputText = cutText.Substring(50, cutText.Length);
 
+                    rtxt_result.AppendText(Environment.NewLine + outputText);
+                    rtxt_result.AppendText(string.Format("{0}", "--------------------") + Environment.NewLine);
+
+                }
             }
 
-
         }
-
-
-
-
-
 
     }
 }
