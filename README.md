@@ -17,4 +17,10 @@ RFC 1321로 지정되어 있으며, 주로 프로그램이나 파일이 원본 �
 <br/>
 
 ### 메인 화면 구성
-![image](https://user-images.githubusercontent.com/41108401/121849294-1fbf1580-cd26-11eb-8b1a-66e8530540c0.png)
+![image](https://user-images.githubusercontent.com/41108401/121995924-b2bd8580-cde2-11eb-94d0-80a7fd9c9ffa.png)
+
+
+<br/>
+
+### MD5 검사 결과
+![image](https://user-images.githubusercontent.com/41108401/121996000-d2ed4480-cde2-11eb-8af9-2e43363df146.png)
