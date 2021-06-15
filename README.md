@@ -24,3 +24,213 @@ RFC 1321로 지정되어 있으며, 주로 프로그램이나 파일이 원본 �
 
 ### MD5 검사 결과
 ![image](https://user-images.githubusercontent.com/41108401/121996000-d2ed4480-cde2-11eb-8af9-2e43363df146.png)
+
+
+<br/>
+
+### 소스코드 - Class 부분 
+```C#
+using System;
+using System.Collections.Generic;
+using System.Diagnostics;
+using System.IO;
+using System.Text;
+
+namespace MD5_Hash_Auto
+{
+    class sg_class
+    {
+
+        public void main()
+        { 
+            
+        }
+
+        public string RunExecute(string strKey)
+        {
+            ProcessStartInfo pri = new ProcessStartInfo();
+            Process pro = new Process();
+
+            pri.FileName = @"cmd.exe";
+            pri.CreateNoWindow = true;
+            pri.UseShellExecute = false;
+
+            pri.RedirectStandardInput = true;                //표준 출력을 리다이렉트
+            pri.RedirectStandardOutput = true;
+            pri.RedirectStandardError = true;
+
+            pro.StartInfo = pri;
+            pro.Start();   //어플리케이션 실
+
+            pro.StandardInput.Write(strKey + Environment.NewLine);
+            pro.StandardInput.Close();
+
+            System.IO.StreamReader sr = pro.StandardOutput;
+
+            string resultValue = sr.ReadToEnd();
+
+            Debug.Print(resultValue + "  <--- 메서드 내 결과");
+            
+            pro.WaitForExit();
+            pro.Close();
+
+            return resultValue == "" ? "" : resultValue;
+
+        }
+        
+        public string GetResourceFileName()
+        {
+            String strAppPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
+            String strFilePath = Path.Combine(strAppPath, "Resources");
+            String strFullFilename = Path.Combine(strFilePath, "fciv.exe"); // Resource에 담겨진 allpair의 경로를 exe 에서 바로 가져오기 위해 path를 가져옴..
+            Debug.Print(strFullFilename);
+
+            return strFullFilename == "" ? "" : strFullFilename;
+            
+        }
+
+    }
+
+}
+
+```
+
+
+<br/>
+
+### 소스코드 - Form 부분
+```c#
+using System;
+using System.Collections.Generic;
+using System.ComponentModel;
+using System.Data;
+using System.Diagnostics;
+using System.Drawing;
+using System.IO;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
+using System.Windows.Forms;
+
+namespace MD5_Hash_Auto
+{
+    public partial class Main_form : Form
+    {
+
+        private sg_class sg;
+
+        public Main_form()
+        {
+            InitializeComponent();
+
+            lst_files.AllowDrop = true;
+
+            init_Event();
+
+           sg = new sg_class();
+            
+        }
+
+        private void init_Event()
+        {
+            this.btn_clear.Click += new EventHandler(this.richText_clear);
+            this.btn_exe.Click += new EventHandler(this.executeRun);
+
+            this.lst_files.DragDrop += new DragEventHandler(lstfile_DragDrop);
+            this.lst_files.DragEnter += new DragEventHandler(lstfile_DragEnter);
+
+            this.btn_init.Click += new EventHandler(this.deleteAllItem);
+        }
+
+        private void lstfile_DragEnter(object sender, DragEventArgs e)
+        {
+            if (e.Data.GetDataPresent(DataFormats.FileDrop))
+            {
+                e.Effect = DragDropEffects.Copy;
+            }
+        }
+
+        private void lstfile_DragDrop(object sender, DragEventArgs e)
+        {
+            string[] files = (string[])e.Data.GetData(DataFormats.FileDrop);
+
+            foreach (string s in files)
+            {
+                lst_files.Items.Add(s);
+            }
+        }
+
+        /// <summary>
+        /// RichTextBox 내용 초기화 메서드
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void richText_clear(object sender, EventArgs e)
+        {
+            rtxt_result.Clear();
+        }
+
+        private void deleteAllItem(object sender, EventArgs e)
+        {
+            lst_files.Items.Clear();
+        }
+
+
+        /// <summary>
+        /// MD5 Check 무결성 
+        /// </summary>
+        /// <param name="sender"></param>
+        /// <param name="e"></param>
+        private void executeRun(object sender, EventArgs e)
+        {
+            // 실제 파일 드래그 했을 때 exe 창에 표시 되도록 
+            string fciv = sg.GetResourceFileName();
+
+            if (lst_files.Items.Count == 0)
+            {
+                MessageBox.Show("무결성 확인을 위한 파일을 추가해주세요.");
+            }
+            else
+            {
+                foreach (string s in lst_files.Items)
+                {
+                    string filePath = Path.Combine(s);
+
+
+                    // 실제 MD5 Hash Check
+                    string resultText = sg.RunExecute($"certutil -hashfile {s} MD5");
+
+                    //resultText = resultText.Replace(s, string.Empty);
+ 
+                    // 명령어 Path 잘라내기
+                    resultText = resultText.Replace(Application.StartupPath.ToString().Substring(0, Application.StartupPath.Length - 1), string.Empty);
+
+                    resultText = resultText.Replace(">", string.Empty);
+
+                    // 테스트 코드 (쓸 때 없는 텍스트를 지워주기 위해 임시로 테스트 )
+                    string cutText = resultText;
+                    string outputText;
+                    outputText = cutText.Substring(cutText.IndexOf("All rights reserved."));
+                    outputText = outputText.Replace("All rights reserved.", string.Empty);
+
+                    rtxt_result.AppendText("--------------------------------------------");
+                    rtxt_result.AppendText($"\r\r{outputText}");
+                    // rtxt_result.AppendText(string.Format("{0}", "--------------------") );
+                    rtxt_result.AppendText("--------------------------------------------");
+                }
+            }
+
+        }
+
+        private void lst_files_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                //delete
+                ((ListBox)sender).Items.RemoveAt(((ListBox)sender).SelectedIndex);
+            }
+        }
+    }
+}
+
+```
