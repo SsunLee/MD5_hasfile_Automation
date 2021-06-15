@@ -45,7 +45,7 @@ namespace MD5_Hash_Auto
             return resultValue == "" ? "" : resultValue;
 
         }
-
+        
         public string GetResourceFileName()
         {
             String strAppPath = Path.GetDirectoryName(System.Diagnostics.Process.GetCurrentProcess().MainModule.FileName);
@@ -57,11 +57,6 @@ namespace MD5_Hash_Auto
             
         }
 
-
     }
-
-
-  
-
 
 }

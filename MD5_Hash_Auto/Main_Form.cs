@@ -25,7 +25,8 @@ namespace MD5_Hash_Auto
 
             init_Event();
 
-            sg = new sg_class();
+           sg = new sg_class();
+            
         }
 
         private void init_Event()
@@ -36,6 +37,7 @@ namespace MD5_Hash_Auto
             this.lst_files.DragDrop += new DragEventHandler(lstfile_DragDrop);
             this.lst_files.DragEnter += new DragEventHandler(lstfile_DragEnter);
 
+            this.btn_init.Click += new EventHandler(this.deleteAllItem);
         }
 
         private void lstfile_DragEnter(object sender, DragEventArgs e)
@@ -63,7 +65,12 @@ namespace MD5_Hash_Auto
         /// <param name="e"></param>
         private void richText_clear(object sender, EventArgs e)
         {
-            rtxt_result.Text = string.Empty;
+            rtxt_result.Clear();
+        }
+
+        private void deleteAllItem(object sender, EventArgs e)
+        {
+            lst_files.Items.Clear();
         }
 
 
@@ -82,6 +89,7 @@ namespace MD5_Hash_Auto
                 {
                     string filePath = Path.Combine(s);
 
+
                     // 실제 MD5 Hash Check
                     string resultText = sg.RunExecute($"certutil -hashfile {s} MD5");
 
@@ -98,15 +106,22 @@ namespace MD5_Hash_Auto
                     outputText = cutText.Substring(cutText.IndexOf("All rights reserved."));
                     outputText = outputText.Replace("All rights reserved.", string.Empty);
 
-
-                    rtxt_result.AppendText("----------------------------------------------------");
+                    rtxt_result.AppendText("--------------------------------------------");
                     rtxt_result.AppendText($"\r\r{outputText}");
                     // rtxt_result.AppendText(string.Format("{0}", "--------------------") );
-                    rtxt_result.AppendText("----------------------------------------------------");
+                    rtxt_result.AppendText("--------------------------------------------");
                 }
             }
 
         }
 
+        private void lst_files_KeyDown(object sender, KeyEventArgs e)
+        {
+            if (e.KeyCode == Keys.Delete)
+            {
+                //delete
+                ((ListBox)sender).Items.RemoveAt(((ListBox)sender).SelectedIndex);
+            }
+        }
     }
 }
