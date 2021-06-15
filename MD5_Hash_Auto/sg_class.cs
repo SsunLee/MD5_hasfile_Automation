@@ -36,6 +36,9 @@ namespace MD5_Hash_Auto
             System.IO.StreamReader sr = pro.StandardOutput;
 
             string resultValue = sr.ReadToEnd();
+
+            Debug.Print(resultValue + "  <--- 메서드 내 결과");
+            
             pro.WaitForExit();
             pro.Close();
 

@@ -81,21 +81,28 @@ namespace MD5_Hash_Auto
                 foreach (string s in lst_files.Items)
                 {
                     string filePath = Path.Combine(s);
-                    Debug.Print(s);
 
-                    string resultText = sg.RunExecute($"{fciv} certutil -hashfile {s} MD5");
-                    Debug.Print(resultText);
+                    // 실제 MD5 Hash Check
+                    string resultText = sg.RunExecute($"certutil -hashfile {s} MD5");
+
+                    //resultText = resultText.Replace(s, string.Empty);
+ 
+                    // 명령어 Path 잘라내기
+                    resultText = resultText.Replace(Application.StartupPath.ToString().Substring(0, Application.StartupPath.Length - 1), string.Empty);
+
+                    resultText = resultText.Replace(">", string.Empty);
 
                     // 테스트 코드 (쓸 때 없는 텍스트를 지워주기 위해 임시로 테스트 )
                     string cutText = resultText;
                     string outputText;
                     outputText = cutText.Substring(cutText.IndexOf("All rights reserved."));
                     outputText = outputText.Replace("All rights reserved.", string.Empty);
-                    //outputText = cutText.Substring(50, cutText.Length);
 
-                    rtxt_result.AppendText(Environment.NewLine + outputText);
-                    rtxt_result.AppendText(string.Format("{0}", "--------------------") + Environment.NewLine);
 
+                    rtxt_result.AppendText("----------------------------------------------------");
+                    rtxt_result.AppendText($"\r\r{outputText}");
+                    // rtxt_result.AppendText(string.Format("{0}", "--------------------") );
+                    rtxt_result.AppendText("----------------------------------------------------");
                 }
             }
 
